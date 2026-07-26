@@ -1,0 +1,18 @@
+{:itonami.blueprint/id "cloud-itonami-marketplace-listing"
+ :itonami.blueprint/name "Federated Marketplace Listing & Buyer Surface"
+ :itonami.blueprint/domain :marketplace/listing-discovery
+ :itonami.blueprint/license "AGPL-3.0-or-later"
+ :itonami.blueprint/social-impact [:consumer-protection :marketplace-integrity :small-seller-access]
+ :itonami.blueprint/governor :listing-governor
+ :itonami.blueprint/robotics false
+ :itonami.blueprint/required-technologies [:identity :forms :audit-ledger :search]
+ :itonami.blueprint/optional-technologies []
+ :itonami.blueprint/status :public-oss
+ :itonami.blueprint/maturity :implemented
+ ;; Function-keyed rather than taxonomy-keyed, following the
+ ;; cloud-itonami-gtin-* precedent (ADR-2607031800).
+ :itonami.blueprint/keying :function
+ :itonami.blueprint/adr "2607264000-marketplace-federated-commerce-layer"
+ ;; The first buyer-facing surface in this fleet — every other actor
+ ;; faces an operator.
+ :itonami.blueprint/buyer-facing true}
