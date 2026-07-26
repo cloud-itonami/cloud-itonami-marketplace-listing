@@ -1,0 +1,10 @@
+{
+  "name": "cloud-itonami-marketplace-buyer",
+  "main": "dist/worker.js",
+  "compatibility_date": "2026-07-26",
+  "observability": { "enabled": true }
+  // No KV, no secrets, no bindings: this Worker serves a published,
+  // admission-cleared snapshot compiled into the bundle. It holds no
+  // credentials because it needs none -- the whole point of publishing a
+  // snapshot rather than running admission at the edge.
+}

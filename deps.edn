@@ -16,6 +16,10 @@
         {io.github.com-junkawasaki/langchain-clj
          {:local/root "../../kotoba-lang/langchain"}}}
   :run {:main-opts ["-m" "listingops.sim"]}
+  ;; Regenerate the buyer Worker's admission-cleared snapshot. Runs the
+  ;; SAME listingops.surface code the tests exercise, so the Worker ships
+  ;; data rather than admission logic.
+  :snapshot {:main-opts ["-m" "listingops.publish"]}
   :test {:extra-paths ["test"]
          :extra-deps {io.github.cognitect-labs/test-runner
                       {:git/tag "v0.5.1" :git/sha "dfb30dd"}}

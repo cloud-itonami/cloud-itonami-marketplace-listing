@@ -1,0 +1,11 @@
+;; The buyer surface Worker. :esm, mirroring gftdcojp/nexus-x402's own
+;; worker build. The bundle deliberately contains only search.model and a
+;; published snapshot -- see listingops.edge.worker's docstring on why
+;; ekyc/aml must not reach a public endpoint.
+{:deps {:aliases [:cljs]}
+ :builds
+ {:worker
+  {:target :esm
+   :output-dir "dist"
+   :modules {:worker {:exports {default listingops.edge.worker/app}}}
+   :compiler-options {:output-feature-set :es2020 :infer-externs :auto}}}}

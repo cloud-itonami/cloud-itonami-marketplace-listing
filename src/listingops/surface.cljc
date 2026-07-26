@@ -175,3 +175,55 @@
      :currency  (:buy-box/currency bb)
      :ranking-key ["landed price asc" "condition rank asc"
                    "lead time asc (unknown last)" "offer id asc"]}))
+
+;; ───────────────────────── published snapshot ─────────────────────────
+
+(defn publish
+  "Freeze the buyer-visible surface into a self-contained snapshot.
+
+  ## Why the edge serves a snapshot rather than running admission
+
+  Two reasons, and the second is the important one.
+
+  It is faster — but more than that, it means the public edge never
+  contains the admission machinery. Running `admission-for` at request
+  time would drag `marketplace.seller` into the edge bundle, and with it
+  `ekyc` and `aml`: identity-verification and sanctions-screening code,
+  deployed to a public, unauthenticated endpoint, to answer a question
+  that was already settled minutes ago. A buyer surface has no business
+  holding that code, and a snapshot is how it avoids it.
+
+  The structural guarantee survives the move: the snapshot is BUILT from
+  `admissible-listings`, so a refused listing is absent from the data
+  the edge is given, exactly as it is absent from the index today.
+
+  `generated-at` is the caller's — this namespace still has no clock —
+  and it is carried on the snapshot so a stale surface is visible rather
+  than silent."
+  [st now generated-at]
+  (let [cleared (admissible-listings st now)
+        products (distinct (map (comp :listing/product first) cleared))]
+    {:snapshot/version      1
+     :snapshot/generated-at generated-at
+     :snapshot/as-of        now
+     :snapshot/index        (listing/index-admissible cleared)
+     :snapshot/sitemap      (vec (sort products))
+     :snapshot/pages        (into {} (for [p products] [p (product-page st now p)]))
+     :snapshot/sellers      (into {} (for [s (distinct (map (comp :listing/seller first) cleared))]
+                                       [s (seller-page st now s)]))
+     :snapshot/listing-count (count cleared)
+     ;; Stated on the artefact: this is what admission cleared, not the
+     ;; catalog. An offer whose seller lapsed is simply not here.
+     :snapshot/admission-applied? true}))
+
+(defn snapshot-search
+  "Run a buyer query against a published snapshot. The only query-time
+  work the edge does, and it needs nothing but `search.model`."
+  [snapshot q]
+  (let [hits (listing/search-listings (:snapshot/index snapshot) q)]
+    {:query q
+     :count (count hits)
+     :results (mapv (fn [d] {:listing-id (:search/id d)
+                             :title (:search/title d)
+                             :score (:search/score d)})
+                    hits)}))

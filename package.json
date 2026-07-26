@@ -1,0 +1,14 @@
+{
+  "name": "cloud-itonami-marketplace-buyer",
+  "private": true,
+  "comment": "shadow-cljs compiles src/listingops/edge/worker.cljs -> dist/worker.js, a Cloudflare Worker serving the published buyer-surface snapshot.",
+  "scripts": {
+    "snapshot": "clojure -M:dev:snapshot",
+    "build": "shadow-cljs release worker",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "devDependencies": {
+    "shadow-cljs": "^2.28.20",
+    "wrangler": "^4.0.0"
+  }
+}
