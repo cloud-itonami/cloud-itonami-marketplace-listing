@@ -146,7 +146,11 @@
                                              ls)}
                             200))))
 
-    :else nil))
+    ;; /escalations and /ledger, implemented once in marketplace.edge.
+    ;; Every high-stakes move in this actor escalates rather than committing
+    ;; on a machine's say-so; without a way to READ those, each of those gates
+    ;; is a black hole.
+    :else (edge/ledger-routes client request env method path :listingops)))
 
 (def app
   (clj->js
