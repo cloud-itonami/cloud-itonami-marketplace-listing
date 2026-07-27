@@ -1,0 +1,15 @@
+{
+  "name": "cloud-itonami-marketplace-listing",
+  "main": "dist-actor/worker.js",
+  "compatibility_date": "2026-07-27",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true }
+  // The listing actor's WRITE host. Separate from wrangler.jsonc, which
+  // deploys the public buyer surface (cloud-itonami-marketplace-buyer):
+  // that bundle contains no credential, ekyc or aml code and this one
+  // necessarily does, so they are not the same deployment.
+  //
+  // Secrets (`wrangler secret put -c wrangler.actor.jsonc`):
+  //   KOTOBASE_SECRET_KEY  Ed25519 seed; the client mints a CACAO per request
+  //   ACTOR_WRITE_TOKEN    gates POST /offers /listings /publish
+}

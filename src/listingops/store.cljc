@@ -22,6 +22,7 @@
   The ledger stays append-only."
   (:require [marketplace.catalog :as catalog]
             [marketplace.listing :as listing]
+            [marketplace.persist :as persist]
             [marketplace.seller :as seller]))
 
 (defprotocol Store
@@ -37,6 +38,7 @@
   (listing-log [s])
   (commit-record! [s record])
   (append-ledger! [s fact])
+  (durable? [s] "False for the test-only memory backend.")
   (with-policy [s p]))
 
 ;; ----------------------------- demo data -----------------------------
@@ -116,6 +118,7 @@
   (catalog-index [s]
     (reduce catalog/add-offer (catalog/empty-catalog) (all-offer-records s)))
   (policy [_] (:policy @a))
+  (durable? [_] false)
   (ledger [_] (:ledger @a))
   (listing-log [_] (:listing-log @a))
   (commit-record! [_ record]
@@ -173,3 +176,71 @@
                           :seller-ok? (sellable? s (:listing/seller l) now)
                           :counterfeit-signal (contains? (:counterfeit-flagged p)
                                                          (:listing/offer l))})))
+
+;; ----------------------------- durable store -----------------------------
+
+(def default-policy
+  "The floor a deployment starts from, not legal advice.
+
+  Kept as a value rather than written into the ref at construction: an
+  operator's policy is an operator decision, and a store that invented
+  one on first boot would be deciding it for them."
+  {:restricted #{} :require #{:authentic-goods :right-to-sell}
+   :counterfeit-flagged #{}})
+
+(defrecord KotobaseStore [st seed]
+  Store
+  ;; Seller credentials are READ here and written by
+  ;; -marketplace-onboarding into the same ref. This actor never issues
+  ;; one; admission to sell is that actor's decision.
+  (seller-credential [_ id] (persist/get-doc (persist/ctx st :credential :seller/id) id))
+  (all-seller-credentials [_] (persist/all-docs (persist/ctx st :credential :seller/id)))
+  (offer-record [_ id] (persist/get-doc (persist/ctx st :offer :offer/id) id))
+  (all-offer-records [_] (persist/all-docs (persist/ctx st :offer :offer/id)))
+  (listing-record [_ id] (persist/get-doc (persist/ctx st :listing :listing/id) id))
+  (all-listing-records [_] (persist/all-docs (persist/ctx st :listing :listing/id)))
+  (catalog-index [s]
+    (reduce catalog/add-offer (catalog/empty-catalog) (all-offer-records s)))
+  (policy [_] (or (persist/get-doc (persist/ctx st :policy :policy/id) "listing")
+                  default-policy))
+  (durable? [_] (not (:persist/memory? st)))
+  (ledger [_] (persist/read-events (persist/stream-ctx st :ledger)))
+  (listing-log [_] (persist/read-events (persist/stream-ctx st :listing-log)))
+  (commit-record! [this record]
+    (persist/append-event! (persist/stream-ctx st :listing-log) seed record)
+    (let [{:keys [op value]} record
+          lctx (persist/ctx st :listing :listing/id)
+          status! (fn [id s]
+                    (when-let [l (listing-record this id)]
+                      (persist/put-doc! lctx (assoc l :listing/status s))))]
+      (case op
+        :draft-listing   (when-let [l (:listing value)] (persist/put-doc! lctx l))
+        :publish-listing (status! (:listing-id value) :live)
+        :suppress-listing (status! (:listing-id value) :suppressed)
+        nil))
+    record)
+  (append-ledger! [_ fact]
+    (persist/append-event! (persist/stream-ctx st :ledger) seed fact))
+  (with-policy [this p]
+    (persist/put-doc! (persist/ctx st :policy :policy/id) (assoc p :policy/id "listing"))
+    this))
+
+(defn kotobase-store
+  "A durable store over a HOST-INJECTED database API. Throws when the
+  host has not wired one, per
+  `:policy/fail-closed-without-host-injection`."
+  [{:keys [db-api seq-fn]}]
+  (->KotobaseStore (persist/store {:db-api db-api :actor "listingops"})
+                   (or seq-fn (let [n (atom 0)] #(swap! n inc)))))
+
+(defn put-offer!
+  "Publish a catalog offer into the shared ref.
+
+  Offers are this actor's to write and every other actor's to read — the
+  order actor prices from them, settlement splits from them. There is no
+  proposal here because there is no judgement: a seller stating their
+  own price is a fact about them, and whether that offer may be LISTED
+  is the separate decision the governor makes."
+  [s offer]
+  (persist/put-doc! (persist/ctx (:st s) :offer :offer/id) offer)
+  offer)

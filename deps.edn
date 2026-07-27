@@ -10,7 +10,12 @@
         ;; cross-seller buy box (ADR-2607264000). This actor re-derives admission
         ;; through it; it never reimplements the rules.
         io.github.kotoba-lang/marketplace
-        {:local/root "../../kotoba-lang/marketplace"}}
+        {:local/root "../../kotoba-lang/marketplace"}
+        ;; HOST half only (`listingops.edge.worker`): q / pull / datoms / transact
+        ;; against kotobase.net with a per-request CACAO. The actor core
+        ;; stays portable .cljc with no network I/O.
+        io.github.kotoba-lang/kotobase-client
+        {:local/root "../../kotoba-lang/kotobase-client"}}
  :aliases
  {:dev {:override-deps
         {io.github.com-junkawasaki/langchain-clj

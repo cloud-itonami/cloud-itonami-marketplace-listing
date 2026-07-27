@@ -8,4 +8,13 @@
   {:target :esm
    :output-dir "dist"
    :modules {:worker {:exports {default listingops.edge.worker/app}}}
+   :compiler-options {:output-feature-set :es2020 :infer-externs :auto}}
+  ;; The WRITE host, deliberately a separate bundle and a separate
+  ;; deployment. Merging it into :worker would put marketplace.seller,
+  ;; ekyc and aml into the public buyer surface -- the exact thing that
+  ;; bundle's docstring promises it does not contain.
+  :actor
+  {:target :esm
+   :output-dir "dist-actor"
+   :modules {:worker {:exports {default listingops.edge.actor/app}}}
    :compiler-options {:output-feature-set :es2020 :infer-externs :auto}}}}
