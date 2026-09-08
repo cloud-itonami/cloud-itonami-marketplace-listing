@@ -3,7 +3,7 @@
   place where an admission mistake becomes visible to a member of the
   public. These tests assert the rule the surface is built on: it can
   only render what admission already cleared."
-  (:require [clojure.string :as str]
+  (:require [kotoba.lang.text :as str]
             [clojure.test :refer [deftest is testing]]
             [listingops.store :as store]
             [listingops.surface :as surface]))

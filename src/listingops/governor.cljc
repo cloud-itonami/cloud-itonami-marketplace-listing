@@ -58,7 +58,7 @@
   seller was already human-approved upstream, and that taking a listing
   down (`:suppress-listing`) is always available and always cheap. The
   asymmetry is deliberate: publish is reversible, admission is not."
-  (:require [clojure.string :as str]
+  (:require [kotoba.lang.text :as str]
             [listingops.store :as store]))
 
 (def confidence-floor 0.6)
@@ -159,7 +159,7 @@
       :detail (str ":effect は :propose のみ許可されるが " (pr-str (:effect proposal)) " が提案された")}]))
 
 (defn- text-blob [proposal]
-  (str/lower-case (pr-str (select-keys proposal [:op :summary :rationale :cites :value]))))
+  (str/lower (pr-str (select-keys proposal [:op :summary :rationale :cites :value]))))
 
 (defn- scope-exclusion-violations [proposal]
   (let [op (:op proposal)
