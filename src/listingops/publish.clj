@@ -8,7 +8,7 @@
 
   `clojure -M:dev:snapshot`"
   (:require [clojure.java.io :as io]
-            [clojure.string :as str]
+            [kotoba.lang.text :as str]
             [listingops.store :as store]
             [listingops.surface :as surface])
   (:import (java.time Instant)))
