@@ -13,7 +13,7 @@
             [listingops.surface :as surface])
   (:import (java.time Instant)))
 
-(def ^:private out "src/listingops/edge/snapshot.cljs")
+(def ^:private out "src/listingops/edge/snapshot.cljk")
 
 (defn -main [& args]
   (let [now (or (first args) "2026-06-01T00:00:00Z")
