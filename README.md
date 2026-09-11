@@ -108,9 +108,9 @@ second-guesses that answer — duplicating the logic would let the two
 drift apart.
 
 ```bash
-clojure -M:dev:run   # publish, see it on the buyer surface, restrict the category, watch it vanish
-clojure -M:test      # 32 tests, 90 assertions
-clojure -M:lint
+kbb -M:dev:run   # publish, see it on the buyer surface, restrict the category, watch it vanish
+kbb -M:test      # 32 tests, 90 assertions
+kbb -M:lint
 ```
 
 ## Rollout phases

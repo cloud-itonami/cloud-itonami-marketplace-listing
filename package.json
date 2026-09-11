@@ -3,8 +3,8 @@
   "private": true,
   "comment": "shadow-cljs compiles src/listingops/edge/worker.cljk -> dist/worker.js, a Cloudflare Worker serving the published buyer-surface snapshot.",
   "scripts": {
-    "snapshot": "clojure -M:dev:snapshot",
-    "build": "shadow-cljs release worker",
+    "snapshot": "kbb -M:dev:snapshot",
+    "build": "amu compile --target wasm32-browser worker",
     "deploy": "npm run build && wrangler deploy"
   },
   "devDependencies": {

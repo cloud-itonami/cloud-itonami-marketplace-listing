@@ -1,6 +1,6 @@
 (ns listingops.sim
   "Offline demo: publish a listing, watch it appear on the buyer surface,
-  restrict its category and watch it disappear. `clojure -M:dev:run`."
+  restrict its category and watch it disappear. `kbb -M:dev:run`."
   (:require [langgraph.graph :as g]
             [listingops.operation :as operation]
             [listingops.store :as store]
