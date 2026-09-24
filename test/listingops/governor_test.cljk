@@ -1,5 +1,5 @@
 (ns listingops.governor-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [listingops.advisor :as advisor]
             [listingops.governor :as governor]
             [listingops.store :as store]))
