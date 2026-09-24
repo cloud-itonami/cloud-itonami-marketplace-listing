@@ -4,7 +4,7 @@
   public. These tests assert the rule the surface is built on: it can
   only render what admission already cleared."
   (:require [kotoba.lang.text :as str]
-            [clojure.test :refer [deftest is testing]]
+            [kotoba.test :refer [deftest is testing]]
             [listingops.store :as store]
             [listingops.surface :as surface]))
 

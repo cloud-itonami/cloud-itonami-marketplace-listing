@@ -2,7 +2,7 @@
   "Integration tests for `listingops.operation/build` -- proves the REAL
   compiled `langgraph.graph` StateGraph runs end-to-end, and that the
   buyer surface reflects what the graph actually committed."
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [langgraph.graph :as g]
             [listingops.operation :as operation]
             [listingops.store :as store]
