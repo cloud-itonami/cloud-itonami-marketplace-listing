@@ -7,7 +7,7 @@
   contains data, not admission logic.
 
   `kbb -M:dev:snapshot`"
-  (:require [clojure.java.io :as io]
+  (:require [kotoba.io :as io]
             [kotoba.lang.text :as str]
             [listingops.store :as store]
             [listingops.surface :as surface])
